@@ -1,0 +1,25 @@
+version: '3'
+services:
+  php:
+    build: ./php
+    volumes:
+      - ./www:/var/www
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+  redis:
+    image: redis
+    command: ["sh", "-c", "exec redis-server --requirepass \"${REDIS_PASSWORD}\""]
+  composer:
+    image: composer:1.9.3
+    environment:
+      - COMPOSER_CACHE_DIR=/app/var/cache/composer
+    volumes:
+      - ./www:/var/www
+    restart: "no"
+  phpunit:
+    image: php:7.4-cli
+    restart: "no"
+    volumes:
+      - ./www:/var/www
+    working_dir: /var/www
+    entrypoint: vendor/bin/phpunit
